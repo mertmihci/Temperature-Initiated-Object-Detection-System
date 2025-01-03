@@ -58,7 +58,7 @@ float BMP280_ConvertToCelsius(int32_t raw_temperature) {
     return temperature / 100;             
 }
 
-void BMP280_ReadTemperature() {
+float BMP280_ReadTemperature() {
     float temperature_sum = 0.0f;
     float temperature_avg = 0.0f;
 
@@ -69,9 +69,7 @@ void BMP280_ReadTemperature() {
     }
 
     temperature_avg = temperature_sum / 128.0f;
-
-    sprintf(buffer, "Averaged Temperature: %.2f C\r\4", temperature_avg);
-    OutStr(buffer);
+		return temperature_avg;
 }
 
 void BMP280_Init() {
