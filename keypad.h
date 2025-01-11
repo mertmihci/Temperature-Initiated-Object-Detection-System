@@ -1,8 +1,9 @@
 #include "TM4C123GH6PM.h"
 #include <stdint.h>
+#include <stdio.h>
 
-#define L_MASK 0x0F // PD0-PD3
-#define R_MASK 0x0F // PB0-PB3
+#define L_MASK 0x0F // PB0-PB3
+#define R_MASK 0x0F // PD0-PD3
 
 extern void OutStr(char*);
 
@@ -30,32 +31,33 @@ void Keypad_Init(void) {
     while ((SYSCTL->PRGPIO& ((1 << 3) | (1 << 1))) == 0); 
 
 
-    GPIOD->DIR |= L_MASK;
-    GPIOD->DEN |= L_MASK;
-		GPIOD->DATA |= 0x0F;
+    GPIOB->DIR |= L_MASK;
+    GPIOB->DEN |= L_MASK;
+		GPIOB->DATA |= 0x0F;
 
 	
-    GPIOB->DIR &= ~R_MASK;
-    GPIOB->DEN |= R_MASK;
-    GPIOB->PDR |= R_MASK;
-
-    GPIOB->IM &= ~R_MASK; 
-    GPIOB->IS &= ~R_MASK; 
-    GPIOB->IBE &= ~R_MASK;
-    GPIOB->IEV |= R_MASK; 
-    GPIOB->ICR |= R_MASK; 
-    GPIOB->IM |= R_MASK;  
-
-		NVIC->ISER[0] |= (1 << 1); 
+    GPIOD->DIR &= ~R_MASK;
+    GPIOD->DEN |= R_MASK;
+    GPIOD->PDR |= R_MASK;
+				
+    GPIOD->IM &= ~R_MASK; 
+    GPIOD->IS &= ~R_MASK; 
+    GPIOD->IBE &= ~R_MASK;
+    GPIOD->IEV |= R_MASK; 
+    GPIOD->ICR |= R_MASK; 
+    GPIOD->IM |= R_MASK;  
+		__asm("CPSIE I");
+		NVIC_SetPriority(GPIOD_IRQn, 7);
+		NVIC->ISER[0] |= (1 << 3); 
 }
 
 uint8_t Keypad_Scan(void) {
-    GPIOD->DATA = 0x00;
+    GPIOB->DATA = 0x00;
     for (uint8_t L = 0; L < 4; L++) {
-        GPIOD->DATA = (1 << L);
-        delay_ms(1);
+        GPIOB->DATA = (1 << L);
+        delay_ms(10);
 
-        uint8_t R = GPIOB->DATA & R_MASK; 
+        uint8_t R = GPIOD->DATA & R_MASK; 
 
 				if(R & 0x1){
 					return keypad_map[L][0];
@@ -73,10 +75,12 @@ uint8_t Keypad_Scan(void) {
    return 0;
 }
 
-void GPIOB_Handler(void) {
+void GPIOD_Handler(void) {
 	
 	char key = Keypad_Scan();
-
+	char buffer[50];
+	sprintf(buffer, "Key : %c \r\4", key);
+	OutStr(buffer);
 
 	if (key >= '0' && key <= '9') 
 	{
@@ -89,6 +93,6 @@ void GPIOB_Handler(void) {
 
 	} 
     
-	GPIOD->DATA = 0x0F;
-	GPIOB->ICR |= 0x0F;
+	GPIOB->DATA |= 0x0F;
+	GPIOD->ICR |= 0x0F;
 }
