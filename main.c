@@ -119,12 +119,12 @@ void GPIOB_Handler(void) {
 }
 void	graph_points(float measurments[33]){
 			for (int i = 0; i < 33; i++) {
-				y_val[i] = (int)((measurments[i]*0.42) * sins[i]);  
+				y_val[i] = 48 - (int)((measurments[i]*0.48) * sins[i]);  
 				if (i > 15) {
-						x_val[i] = 42 + (int)((measurments[i]*0.42) * coss[i]);  
+						x_val[i] = 41 + (int)((measurments[i]*0.42) * coss[i]);  
 				} 
 				else {
-						x_val[i] = (int)((measurments[i]*0.42) * coss[i]); 
+						x_val[i] = 42 - (int)((measurments[i]*0.42) * coss[i]); 
 				}
 		}
 }
