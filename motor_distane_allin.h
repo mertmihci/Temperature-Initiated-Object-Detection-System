@@ -158,16 +158,19 @@ float* objectdetection(void){
 int main(void){
 		motor_init();
 		distance_init();
-		objectdetection();
-		arrange_leds();
+		Keypad_Init();
+		float measurment_out[16];
+		memcpy(measurment_out, objectdetection(), sizeof(measurment_out));
 		char buffer[50];	
 		for(int i = 0; i < 16 ; i++){
-				sprintf(buffer, "%d st Distance: %.2f cm \r\4",(i+1) , measurments[i]);
+				sprintf(buffer, "%d st Distance: %.2f cm \r\4",(i+1) , measurment_out[i]);
 				OutStr(buffer); // Assuming outstr handles terminal output
 				delay_ms(10);
 		}
 		while(1){
 
+				delay_ms(100);
+				
 		}
 }
 */
