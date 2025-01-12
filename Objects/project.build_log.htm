@@ -30,7 +30,7 @@ Build target 'Target 1'
 compiling main.c...
 speaker.h(22): warning:  #1035-D: single-precision operand implicitly converted to double-precision
       int frequency = (int)(mappedFreq + 0.5);
-motor_distance.h(79): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+motor_distance.h(78): warning:  #1035-D: single-precision operand implicitly converted to double-precision
   		distance = ((float)pulse_width * 0.034) / 2; // Correct formula
 motor_distance.h(122): warning:  #1035-D: single-precision operand implicitly converted to double-precision
   				if(measurments[i] < 50.0){
@@ -38,10 +38,16 @@ motor_distance.h(126): warning:  #1035-D: single-precision operand implicitly co
   				else if(measurments[i] < 75.0){
 motor_distance.h(129): warning:  #1035-D: single-precision operand implicitly converted to double-precision
   				else if(measurments[i] < 100.0){
-main.c: 5 warnings, 0 errors
-linking...
-Program Size: Code=15418 RO-data=2182 RW-data=28 ZI-data=4868  
-".\Objects\project.axf" - 0 Error(s), 5 Warning(s).
+main.c(20): warning:  #77-D: this declaration has no storage class or type specifier
+  graph [31] = (char)1;
+main.c(20): error:  #147: declaration is incompatible with "char *graph[504]"  (declared at line 19)
+  graph [31] = (char)1;
+main.c(20): error:  #144: a value of type "char" cannot be used to initialize an entity of type "char *[504]"
+  graph [31] = (char)1;
+main.c(177): warning:  #167-D: argument of type "char **" is incompatible with parameter of type "const char *"
+  							Nokia5110_DrawFullImage(graph);	
+main.c: 7 warnings, 2 errors
+".\Objects\project.axf" - 2 Error(s), 7 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -67,10 +73,11 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.1.2
 
    * Component: Keil::Device:Startup:1.0.1
+      Source file:   Device\Source\ARM\startup_TM4C123.s
       Source file:   Device\Source\system_TM4C123.c
       Include file:  Device\Include\TM4C123\TM4C123.h
-      Source file:   Device\Source\ARM\startup_TM4C123.s
-Build Time Elapsed:  00:00:01
+Target not created.
+Build Time Elapsed:  00:00:00
 </pre>
 </body>
 </html>

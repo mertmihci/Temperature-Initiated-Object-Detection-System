@@ -6,11 +6,18 @@
 #include "keypad.h"
 #include "motor_distance.h"
 
+
 volatile float LM35_Temperature = 0;
 volatile float BMP280_Temperature = 0;
 float Digital_Temperature_Threshold = 0;
-uint8_t keypad_read_value = 0;
-
+float angle[33] = {
+		0.00, 5.63, 11.25, 16.88, 22.50, 28.13, 33.75, 39.38, 45.00, 50.63,
+		56.25, 61.88, 67.50, 73.13, 78.75, 84.38, 90.00, 95.63, 101.25, 106.88,
+		112.50, 118.13, 123.75, 129.38, 135.00, 140.63, 146.25, 151.88, 157.50, 163.13,
+		168.75, 174.38, 180.00
+};
+volatile uint8_t keypad_read_value = 0;
+volatile uint8_t switch_screen = 1;
 volatile uint8_t Deep_Sleep_Mode = 1;
 volatile uint8_t Once_Flag = 1;
 void Speaker_Works(float BMP280_temp){
@@ -61,8 +68,7 @@ void Info_Screen()
 void GPIOB_Handler(void) {
 	
 	char key = Keypad_Scan();
-	//print("Key: %c", key);
-	
+
 	if (key >= '0' && key <= '9') 
 	{
 			keypad_read_value = (keypad_read_value * 10) + (key - '0');
@@ -89,11 +95,18 @@ void GPIOB_Handler(void) {
 					Digital_Temperature_Threshold = keypad_read_value;
 					keypad_read_value = 0;
 	} 
+	else if (key == '#') 
+	{
+		switch_screen ^= 1;
+	}
     
 	GPIOD->DATA |= 0x0F;
 	GPIOB->ICR |= 0x0F;
 }
-	
+
+
+
+
 int main(){
 	
 	Nokia5110_Init();
@@ -128,12 +141,48 @@ int main(){
 		{		
 				Once_Flag = 0;
 				Speaker_Works(BMP280_Temperature);
-				float measurments[16];
-				memcpy(measurments, objectdetection(), sizeof(measurments));
-				for(int i = 0; i < 16 ; i++){
-				print("%d st Distance: %.2f cm \r\4",(i+1) , measurments[i]);
-				delay_ms(2);
-		}
+				float measurments[33];
+				objectdetection(measurments);
+				uint8_t object_detected = 0;
+				uint8_t printed_angle_index = 0;
+			
+				for(int i = 0; i < 32 ; i++)
+				{
+					if (measurments[i] != 100)
+					{
+							printed_angle_index = i;
+							object_detected = 1;
+							break;
+					}
+					else{}
+				}
+				
+								
+				while(!Deep_Sleep_Mode){
+					if(object_detected)
+					{
+					Nokia5110_Clear();
+					
+						if(switch_screen)
+						{
+							sprintf(buffer, "Ang.: %.2f ", angle[printed_angle_index]);
+							Nokia5110_OutString(buffer);
+							sprintf(buffer, "Dist: %.2f ", measurments[printed_angle_index]);
+							Nokia5110_OutString(buffer);	
+						}
+						else
+						{
+							Nokia5110_DrawFullImage(graph);	
+						}
+			
+					}
+					else
+					{
+						Nokia5110_Clear();
+						Nokia5110_OutString("  !NO OBJECT!");
+					}
+				}
+				
 		}
 		delay_ms(500);	
 	}

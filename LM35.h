@@ -21,6 +21,7 @@ void Init_ACOMP1()
 		COMP->ACMIS |= 0x03;			
     COMP->ACINTEN |= 0x2;      
 		NVIC->ISER[0] |= (1 << 26);
+		NVIC_SetPriority(COMP1_IRQn, 7);
 }
 
 void Init_LM35() 
