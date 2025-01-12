@@ -1,6 +1,5 @@
 #include "utils.h"
 
-
 void distance_init(void){
 
 		// Configure PF4 for input capture, PF0 for triggering pulse
@@ -97,7 +96,7 @@ void forwardstep(void){
 		//Uses PE0-3
 		uint8_t steps [4] = {0b0001, 0b0010, 0b0100, 0b1000};
 		uint8_t step_no = 0;
-		for(int i = 0; i < 64 ; i++){
+		for(int i = 0; i < 32 ; i++){
 				GPIOE->DATA &= ~0xF;
 				GPIOE->DATA |= steps[step_no];
 				step_no = (step_no == 3) ? 0 : step_no + 1;
@@ -118,8 +117,8 @@ void turnback(void){
 
 void arrange_leds(float* measurments){
 		uint8_t state = 0;
-		GPIOF->DATA &= ~(0xE);
-		for(int i = 0; i < 16; i++){
+		GPIOF->DATA &= ~0xE;
+		for(int i = 0; i < 33; i++){
 				if(measurments[i] < 50.0){
 						state |= 0x4;
 						break;
@@ -140,36 +139,36 @@ void arrange_leds(float* measurments){
 		else if((state & 0x1) == 0x1){
 				GPIOF->DATA |= 0x8;
 		}
-		else{
-			GPIOF->DATA &= ~(0xE);
-		}
 }
 
-float* objectdetection(void){
-		static float measurments[16];
-		for(int i = 0; i < 16; i++){
+void objectdetection(float measurments[33]){
+		//static float measurments[33];
+		for(int i = 0; i < 32; i++){
 					measurments[i] = measure_pulse();
 					forwardstep();
 		}
+		measurments[32] = measure_pulse();
 		delay_ms(100);
 		turnback();
 		arrange_leds(measurments);
-		return measurments;
 }
 /*
 int main(void){
 		motor_init();
 		distance_init();
-		objectdetection();
-		arrange_leds();
+		Keypad_Init();
+		float measurment_out[33];
+		memcpy(measurment_out, objectdetection(), sizeof(measurment_out));
 		char buffer[50];	
-		for(int i = 0; i < 16 ; i++){
-				sprintf(buffer, "%d st Distance: %.2f cm \r\4",(i+1) , measurments[i]);
+		for(int i = 0; i < 33 ; i++){
+				sprintf(buffer, "%d st Distance: %.2f cm \r\4",(i+1) , measurment_out[i]);
 				OutStr(buffer); // Assuming outstr handles terminal output
 				delay_ms(10);
 		}
 		while(1){
 
+				delay_ms(100);
+				
 		}
 }
 */
