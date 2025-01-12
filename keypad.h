@@ -1,16 +1,9 @@
-#include "TM4C123GH6PM.h"
+#include "utils.h"
 #include <stdint.h>
+#include <stdio.h>
 
-#define L_MASK 0x0F // PD0-PD3
-#define R_MASK 0x0F // PB0-PB3
-
-extern void OutStr(char*);
-
-volatile uint8_t pressed_key = 0xFF;
-volatile uint8_t keypad_read_value = 0;
-volatile uint32_t digital_temperature_threshold = 31;  
-
-char buffer[100];
+#define L_MASK 0x0F // PB0-PB3
+#define R_MASK 0x0F // PD0-PD3
 
 const uint8_t keypad_map[4][4] = {
     { '1', '2', '3', 'A' },
@@ -18,12 +11,6 @@ const uint8_t keypad_map[4][4] = {
     { '7', '8', '9', 'C' },
     { '*', '0', '#', 'D' }
 };
-
-void delay_ms(uint32_t delay) {
-    for (uint32_t i = 0; i < (2000*delay); i++) {
-        __asm("NOP");
-    }
-}
 
 void Keypad_Init(void) {
 		SYSCTL->RCGCGPIO |= (1 << 3) | (1 << 1); 
@@ -38,7 +25,7 @@ void Keypad_Init(void) {
     GPIOB->DIR &= ~R_MASK;
     GPIOB->DEN |= R_MASK;
     GPIOB->PDR |= R_MASK;
-
+				
     GPIOB->IM &= ~R_MASK; 
     GPIOB->IS &= ~R_MASK; 
     GPIOB->IBE &= ~R_MASK;
@@ -50,11 +37,9 @@ void Keypad_Init(void) {
 }
 
 uint8_t Keypad_Scan(void) {
-    GPIOD->DATA = 0x00;
+    GPIOD->DATA &= ~0x0F;
     for (uint8_t L = 0; L < 4; L++) {
-        GPIOD->DATA = (1 << L);
-        delay_ms(1);
-
+        GPIOD->DATA |= (1 << L);
         uint8_t R = GPIOB->DATA & R_MASK; 
 
 				if(R & 0x1){
@@ -71,24 +56,4 @@ uint8_t Keypad_Scan(void) {
 				}
     }
    return 0;
-}
-
-void GPIOB_Handler(void) {
-	
-	char key = Keypad_Scan();
-
-
-	if (key >= '0' && key <= '9') 
-	{
-			keypad_read_value = (keypad_read_value * 10) + (key - '0');
-	} 
-	else if (key == 'D') 
-	{
-					digital_temperature_threshold = keypad_read_value;
-					keypad_read_value = 0;
-
-	} 
-    
-	GPIOD->DATA = 0x0F;
-	GPIOB->ICR |= 0x0F;
 }
