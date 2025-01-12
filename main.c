@@ -16,6 +16,20 @@ float angle[33] = {
 		112.50, 118.13, 123.75, 129.38, 135.00, 140.63, 146.25, 151.88, 157.50, 163.13,
 		168.75, 174.38, 180.00
 };
+float coss[33] = {
+    1.00, 0.99, 0.98, 0.95, 0.92, 0.88, 0.82, 0.76, 0.70, 0.63,
+    0.57, 0.50, 0.38, 0.29, 0.19, 0.09, 0.00, 0.09, 0.19, 0.29,
+    0.38, 0.50, 0.57, 0.63, 0.70, 0.76, 0.82, 0.88, 0.92, 0.95,
+    0.98, 0.99, 1.00
+};
+float sins[33] = {
+    0.00, 0.09, 0.19, 0.28, 0.38, 0.46, 0.54, 0.62, 0.70, 0.76,
+    0.82, 0.87, 0.92, 0.95, 0.98, 0.99, 1.00, 0.99, 0.98, 0.95,
+    0.92, 0.87, 0.82, 0.76, 0.70, 0.62, 0.54, 0.46, 0.38, 0.28,
+    0.19, 0.09, 0.00
+};
+int x_val[33];
+int y_val[33];
 volatile uint8_t keypad_read_value = 0;
 volatile uint8_t switch_screen = 1;
 volatile uint8_t Deep_Sleep_Mode = 1;
@@ -103,7 +117,17 @@ void GPIOB_Handler(void) {
 	GPIOD->DATA |= 0x0F;
 	GPIOB->ICR |= 0x0F;
 }
-
+void	graph_points(float measurments[33]){
+			for (int i = 0; i < 33; i++) {
+				y_val[i] = (int)((measurments[i]*0.42) * sins[i]);  
+				if (i > 15) {
+						x_val[i] = 42 + (int)((measurments[i]*0.42) * coss[i]);  
+				} 
+				else {
+						x_val[i] = (int)((measurments[i]*0.42) * coss[i]); 
+				}
+		}
+}
 
 
 
