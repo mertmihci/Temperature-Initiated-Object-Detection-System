@@ -3,6 +3,9 @@
 ## Overview
 This project is part of the **Introduction to Microprocessors and Microcontrollers** course and focuses on developing a **Temperature-Initiated Object Detection System** using the **TM4C123G** microcontroller. The system integrates temperature sensing, deep sleep mode, object detection, and user interface elements to achieve an intelligent and efficient monitoring solution.
 
+## Video
+https://www.youtube.com/watch?v=mumdWP6igl8
+
 ## Features
 - **Deep Sleep Mode**: Conserves power while monitoring ambient temperature using the **LM35 analog sensor**.
 - **Temperature Verification**: Uses the **BMP280 digital sensor (I2C)** for precise measurement after waking up.
